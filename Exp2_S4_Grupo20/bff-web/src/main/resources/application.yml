@@ -1,0 +1,26 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+spring:
+  application:
+    name: bff-web
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bank_batch}
+    username: ${DB_USER:bank_batch}
+    password: ${DB_PASSWORD:bank_batch}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+
+security:
+  jwt:
+    secret: ${WEB_JWT_SECRET:web-bff-super-secreto-cambiar-en-produccion-0001}
+    issuer: bff-web
+    expiration-minutes: ${WEB_JWT_EXP_MIN:60}
+
+logging:
+  level:
+    com.duocuc.bankbff: INFO

@@ -1,0 +1,28 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: bff-atm
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bank_batch}
+    username: ${DB_USER:bank_batch}
+    password: ${DB_PASSWORD:bank_batch}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+
+security:
+  jwt:
+    secret: ${ATM_JWT_SECRET:atm-bff-secreto-distinto-y-mas-critico-0003}
+    issuer: bff-atm
+    expiration-minutes: ${ATM_JWT_EXP_MIN:3}
+  atm:
+    api-key: ${ATM_DEVICE_API_KEY:atm-device-key-demo-cambiar}
+
+logging:
+  level:
+    com.duocuc.bankbff: INFO

@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bank_batch_postgres
+    environment:
+      POSTGRES_DB: bank_batch
+      POSTGRES_USER: bank_batch
+      POSTGRES_PASSWORD: bank_batch
+    ports:
+      - "5432:5432"
+    volumes:
+      - bank_batch_pgdata:/var/lib/postgresql/data
+
+volumes:
+  bank_batch_pgdata:

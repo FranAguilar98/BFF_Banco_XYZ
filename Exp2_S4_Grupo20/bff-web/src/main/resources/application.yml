@@ -24,3 +24,6 @@ security:
 logging:
   level:
     com.duocuc.bankbff: INFO
+
+    ms-transacciones:
+      base-url: http://localhost:8092

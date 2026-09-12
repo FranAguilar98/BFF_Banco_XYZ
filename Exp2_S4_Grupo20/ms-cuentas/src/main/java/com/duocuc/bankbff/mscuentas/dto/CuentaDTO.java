@@ -6,6 +6,9 @@ public record CuentaDTO(
         Long cuentaOrigenId,
         String nombre,
         String tipo,
-        BigDecimal saldoFinal,
-        BigDecimal tasaAplicada) {
+        Integer edad,
+        BigDecimal saldoInicial,
+        BigDecimal tasaAplicada,
+        BigDecimal interesCalculado,
+        BigDecimal saldoFinal) {
 }

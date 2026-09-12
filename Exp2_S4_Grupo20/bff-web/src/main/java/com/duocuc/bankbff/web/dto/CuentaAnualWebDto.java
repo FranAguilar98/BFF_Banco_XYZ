@@ -1,6 +1,6 @@
 package com.duocuc.bankbff.web.dto;
 
-import com.duocuc.bankbff.core.domain.entity.CuentaAnualEntity;
+import com.duocuc.bankbff.web.client.MovimientoClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,7 +11,7 @@ public record CuentaAnualWebDto(
         BigDecimal monto,
         String descripcion
 ) {
-    public static CuentaAnualWebDto from(CuentaAnualEntity e) {
-        return new CuentaAnualWebDto(e.getFecha(), e.getTransaccion(), e.getMonto(), e.getDescripcion());
+    public static CuentaAnualWebDto from(MovimientoClient.MovimientoResponse r) {
+        return new CuentaAnualWebDto(r.fecha(), r.transaccion(), r.monto(), r.descripcion());
     }
 }

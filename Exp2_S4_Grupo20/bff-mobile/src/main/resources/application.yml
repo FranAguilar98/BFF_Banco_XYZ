@@ -24,3 +24,11 @@ security:
 logging:
   level:
     com.duocuc.bankbff: INFO
+    
+backend:
+  connect-timeout-ms: 2000
+  read-timeout-ms: 3000
+  ms-cuentas:
+    base-url: http://localhost:8090
+  ms-transacciones:
+    base-url: http://localhost:8092

@@ -1,27 +1,26 @@
 package com.duocuc.bankbff.web.service;
 
-import com.duocuc.bankbff.core.repository.TransaccionRepository;
+import com.duocuc.bankbff.web.client.TransaccionClient;
 import com.duocuc.bankbff.web.dto.TransaccionWebDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class TransaccionWebService {
 
-    private final TransaccionRepository transaccionRepository;
+    private final TransaccionClient transaccionClient;
 
     public Page<TransaccionWebDto> listar(LocalDate desde, LocalDate hasta, String tipo, Pageable pageable) {
-        if (desde != null && hasta != null) {
-            return transaccionRepository.findByFechaBetween(desde, hasta, pageable).map(TransaccionWebDto::from);
-        }
-        if (tipo != null && !tipo.isBlank()) {
-            return transaccionRepository.findByTipo(tipo, pageable).map(TransaccionWebDto::from);
-        }
-        return transaccionRepository.findAll(pageable).map(TransaccionWebDto::from);
+        TransaccionClient.PageResponse<TransaccionClient.TransaccionResponse> page =
+                transaccionClient.listar(desde, hasta, tipo, pageable);
+        List<TransaccionWebDto> contenido = page.content().stream().map(TransaccionWebDto::from).toList();
+        return new PageImpl<>(contenido, pageable, page.totalElements());
     }
 }

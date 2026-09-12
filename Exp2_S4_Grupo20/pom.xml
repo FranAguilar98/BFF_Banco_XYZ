@@ -24,11 +24,26 @@
         <jjwt.version>0.12.6</jjwt.version>
     </properties>
 
+    <build>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+</build>
+
     <modules>
         <module>bff-core</module>
         <module>bff-web</module>
         <module>bff-mobile</module>
         <module>bff-atm</module>
+        <module>ms-cuentas</module>
+        <module>ms-movimientos</module>
+        <module>ms-transacciones</module>
     </modules>
 
     <dependencyManagement>

@@ -1,6 +1,6 @@
 package com.duocuc.bankbff.web.dto;
 
-import com.duocuc.bankbff.core.domain.entity.TransaccionEntity;
+import com.duocuc.bankbff.web.client.TransaccionClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,10 +13,9 @@ public record TransaccionWebDto(
         boolean anomalia,
         String motivoAnomalia
 ) {
-    public static TransaccionWebDto from(TransaccionEntity e) {
+    public static TransaccionWebDto from(TransaccionClient.TransaccionResponse r) {
         return new TransaccionWebDto(
-                e.getTransaccionOrigenId(), e.getFecha(), e.getMonto(),
-                e.getTipo(), Boolean.TRUE.equals(e.getAnomalia()), e.getMotivoAnomalia()
+                r.transaccionOrigenId(), r.fecha(), r.monto(), r.tipo(), r.anomalia(), r.motivoAnomalia()
         );
     }
 }

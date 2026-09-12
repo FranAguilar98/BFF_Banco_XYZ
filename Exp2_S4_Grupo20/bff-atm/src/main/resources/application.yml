@@ -26,3 +26,9 @@ security:
 logging:
   level:
     com.duocuc.bankbff: INFO
+
+backend:
+  ms-cuentas:
+    base-url: http://localhost:8090
+  ms-movimientos:
+    base-url: http://localhost:8091

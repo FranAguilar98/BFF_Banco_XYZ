@@ -1,4 +1,4 @@
-package com.duocuc.bankbff.core.domain.entity;
+package com.duocuc.bankbff.mstransacciones.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

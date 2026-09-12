@@ -1,4 +1,4 @@
-package com.duocuc.bankbff.core.domain.entity;
+package com.duocuc.bankbff.msmovimientos.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CuentaAnualEntity {
+public class MovimientoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

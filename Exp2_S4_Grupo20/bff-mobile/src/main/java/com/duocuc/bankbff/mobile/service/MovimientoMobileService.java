@@ -1,6 +1,6 @@
 package com.duocuc.bankbff.mobile.service;
 
-import com.duocuc.bankbff.core.repository.TransaccionRepository;
+import com.duocuc.bankbff.mobile.client.TransaccionClient;
 import com.duocuc.bankbff.mobile.dto.MovimientoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MovimientoMobileService {
 
-    private final TransaccionRepository transaccionRepository;
+    private final TransaccionClient transaccionClient;
 
     public List<MovimientoDto> recientes() {
-        return transaccionRepository.findTop10ByOrderByFechaDescIdDesc()
+        return transaccionClient.recientes()
                 .stream().map(MovimientoDto::from).toList();
     }
 }

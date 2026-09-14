@@ -65,32 +65,59 @@ base de datos.
 
 ## 4. Cómo ejecutar
 
-```bash
-# 1) Levantar Postgres
-docker compose up -d
+### Modo de prueba (H2 en memoria — el usado para la evidencia de este entregable)
 
-# 2) Compilar todo el multi-módulo desde la raíz de este proyecto
+Los tres microservicios (`ms-cuentas`, `ms-movimientos`, `ms-transacciones`)
+están configurados para arrancar con una base de datos H2 en memoria,
+que se autogenera y se llena automáticamente al iniciar leyendo los CSV
+oficiales (`bank_legacy_data`) desde `src/main/resources/data/`. No
+requiere Docker ni PostgreSQL para este modo.
+
+```bash
+# 1) Compilar e instalar todo el multi-módulo (una sola vez, o cada vez que cambie el código)
 mvn clean install
 
-# 3) Levantar los microservicios primero (los BFF dependen de ellos)
+# 2) Levantar los microservicios primero (los BFF dependen de ellos), cada uno en su propia terminal
 mvn -pl ms-cuentas       spring-boot:run
 mvn -pl ms-movimientos   spring-boot:run
 mvn -pl ms-transacciones spring-boot:run
 
-# 4) Levantar cada BFF en una terminal distinta
+# 3) Levantar cada BFF, cada uno en su propia terminal
 mvn -pl bff-web    spring-boot:run
 mvn -pl bff-mobile spring-boot:run
 mvn -pl bff-atm    spring-boot:run
 ```
 
-Por defecto, los tres microservicios esperan Postgres en
-`localhost:5432`, base `bank_batch`, usuario/clave
-`bank_batch`/`bank_batch` (mismos valores que el `docker-compose.yml`).
-Los BFF, a su vez, esperan a los microservicios en `localhost:8090`
-(`ms-cuentas`), `localhost:8091` (`ms-movimientos`) y `localhost:8092`
-(`ms-transacciones`). Todo es configurable por variables de entorno
-(`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`,
-`SERVER_PORT`, etc.), ver cada `application.yml`.
+Cada microservicio imprime en su log cuántos registros cargó y cuántos
+rechazó por datos inválidos (por ejemplo:
+`ms-cuentas: 17 cuentas cargadas, 983 filas rechazadas por datos invalidos`),
+ya que el dataset oficial incluye intencionalmente filas con datos
+inconsistentes (edades fuera de rango, montos inválidos, tipos de cuenta
+inexistentes, duplicados).
+
+Cuentas de ejemplo ya cargadas y listas para probar: `101, 105, 106, 108,
+109, 117, 118, 122, 124, 127, 128, 130, 132, 133, 143, 144, 147`.
+
+Puedes inspeccionar los datos cargados desde el navegador en la consola
+de H2 de cada microservicio, por ejemplo:
+`http://localhost:8090/h2-console` (JDBC URL: `jdbc:h2:mem:mscuentas`,
+usuario `sa`, sin contraseña).
+
+### Modo productivo (PostgreSQL vía Docker)
+
+Para un despliegue más cercano a producción, cada microservicio también
+puede apuntar a PostgreSQL en vez de H2 (basta con cambiar la
+dependencia `h2` por `postgresql` en su `pom.xml` y ajustar su
+`application.yml` con las credenciales de abajo):
+
+```bash
+docker compose up -d
+```
+
+Esto levanta un Postgres en `localhost:5432`, base `bank_batch`,
+usuario/clave `bank_batch`/`bank_batch`. En este modo, los datos deben
+poblarse mediante el proyecto de migración batch de la Semana 3 (Spring
+Batch), no con los cargadores CSV descritos arriba.
 
 ## 5. Autenticación y autorización por canal
 

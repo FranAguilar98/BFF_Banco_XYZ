@@ -26,8 +26,8 @@ public class AtmAuthService {
         this.tokenProvider = new JwtTokenProvider(secret, issuer, expMinutes * 60_000);
         this.expMinutes = expMinutes;
         this.tarjetas = Map.of(
-                "4551000000000001", new TarjetaRecord(encoder.encode("1234"), 1001L),
-                "4551000000000002", new TarjetaRecord(encoder.encode("5678"), 1002L)
+                "4551000000000001", new TarjetaRecord(encoder.encode("1234"), 101L),
+                "4551000000000002", new TarjetaRecord(encoder.encode("5678"), 105L)
         );
     }
 

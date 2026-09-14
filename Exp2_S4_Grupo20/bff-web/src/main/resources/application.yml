@@ -21,9 +21,16 @@ security:
     issuer: bff-web
     expiration-minutes: ${WEB_JWT_EXP_MIN:60}
 
+backend:
+  connect-timeout-ms: 2000
+  read-timeout-ms: 3000
+  ms-cuentas:
+    base-url: http://localhost:8090
+  ms-movimientos:
+    base-url: http://localhost:8091
+  ms-transacciones:
+    base-url: http://localhost:8092
+
 logging:
   level:
     com.duocuc.bankbff: INFO
-
-    ms-transacciones:
-      base-url: http://localhost:8092

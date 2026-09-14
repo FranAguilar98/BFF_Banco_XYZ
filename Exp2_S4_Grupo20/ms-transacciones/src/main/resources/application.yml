@@ -5,15 +5,18 @@ spring:
   application:
     name: ms-transacciones
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bank_batch}
-    username: ${DB_USER:bank_batch}
-    password: ${DB_PASSWORD:bank_batch}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:h2:mem:mstransacciones;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     open-in-view: false
+  h2:
+    console:
+      enabled: true
 
 logging:
   level:

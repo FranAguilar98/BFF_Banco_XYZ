@@ -1,6 +1,6 @@
 package com.duocuc.bankbff.web.dto;
 
-import com.duocuc.bankbff.web.client.MovimientoClient;
+import com.duocuc.bankbff.core.client.MovimientoClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

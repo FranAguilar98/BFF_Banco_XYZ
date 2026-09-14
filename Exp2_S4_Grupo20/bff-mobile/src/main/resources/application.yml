@@ -32,3 +32,5 @@ backend:
     base-url: http://localhost:8090
   ms-transacciones:
     base-url: http://localhost:8092
+  ms-movimientos:
+    base-url: http://localhost:8091

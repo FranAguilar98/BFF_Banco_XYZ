@@ -1,6 +1,6 @@
 package com.duocuc.bankbff.web.dto;
 
-import com.duocuc.bankbff.web.client.CuentaClient;
+import com.duocuc.bankbff.core.client.CuentaClient;
 
 import java.math.BigDecimal;
 

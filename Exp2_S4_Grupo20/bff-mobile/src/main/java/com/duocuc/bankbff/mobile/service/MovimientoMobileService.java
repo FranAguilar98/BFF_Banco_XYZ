@@ -1,6 +1,6 @@
 package com.duocuc.bankbff.mobile.service;
 
-import com.duocuc.bankbff.mobile.client.TransaccionClient;
+import com.duocuc.bankbff.core.client.TransaccionClient;
 import com.duocuc.bankbff.mobile.dto.MovimientoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

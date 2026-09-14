@@ -1,7 +1,6 @@
 package com.duocuc.bankbff.mobile.dto;
 
-import com.duocuc.bankbff.mobile.client.TransaccionClient;
-
+import com.duocuc.bankbff.core.client.TransaccionClient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

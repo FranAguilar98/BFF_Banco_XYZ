@@ -1,7 +1,7 @@
 package com.duocuc.bankbff.web.service;
 
-import com.duocuc.bankbff.web.client.CuentaClient;
-import com.duocuc.bankbff.web.client.MovimientoClient;
+import com.duocuc.bankbff.core.client.CuentaClient;
+import com.duocuc.bankbff.core.client.MovimientoClient;
 import com.duocuc.bankbff.web.dto.CuentaAnualWebDto;
 import com.duocuc.bankbff.web.dto.CuentaWebDto;
 import lombok.RequiredArgsConstructor;

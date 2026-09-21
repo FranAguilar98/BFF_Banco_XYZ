@@ -1,6 +1,6 @@
 # Banco XYZ — Suite BFF (Backend for Frontend)
 
-**PBY2203 — Desarrollo Backend III — Semana 4 y 5 (Exp2)**
+**PBY2203 — Desarrollo Backend III — Semana 6**
 
 ## 1. Objetivo del proyecto
 

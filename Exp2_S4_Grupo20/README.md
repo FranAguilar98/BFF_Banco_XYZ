@@ -21,6 +21,8 @@ independiente por dominio de datos**:
 | `ms-cuentas` | 8090 | Saldo e interés de cada cuenta |
 | `ms-movimientos` | 8091 | Historial de retiros/depósitos por cuenta |
 | `ms-transacciones` | 8092 | Feed global de transacciones (detección de anomalías) |
+| `config-server` | 8888 | Configuración centralizada (Spring Cloud Config) |
+| `eureka-server` | 8761 | Service Discovery (Spring Cloud Netflix Eureka) |
 
 Ningún BFF accede a la base de datos directamente: todos llaman a estos
 tres microservicios por HTTP (con `RestClient`), y combinan su
@@ -67,22 +69,20 @@ base de datos.
 
 ### Modo de prueba (H2 en memoria — el usado para la evidencia de este entregable)
 
-Los tres microservicios (`ms-cuentas`, `ms-movimientos`, `ms-transacciones`)
-están configurados para arrancar con una base de datos H2 en memoria,
-que se autogenera y se llena automáticamente al iniciar leyendo los CSV
-oficiales (`bank_legacy_data`) desde `src/main/resources/data/`. No
-requiere Docker ni PostgreSQL para este modo.
-
 ```bash
 # 1) Compilar e instalar todo el multi-módulo (una sola vez, o cada vez que cambie el código)
 mvn clean install
 
-# 2) Levantar los microservicios primero (los BFF dependen de ellos), cada uno en su propia terminal
+# 2) Levantar primero la infraestructura de Spring Cloud, cada uno en su propia terminal
+mvn -pl config-server spring-boot:run
+mvn -pl eureka-server spring-boot:run
+
+# 3) Levantar los microservicios (ms-cuentas depende de config-server; ms-movimientos se registra en eureka-server)
 mvn -pl ms-cuentas       spring-boot:run
 mvn -pl ms-movimientos   spring-boot:run
 mvn -pl ms-transacciones spring-boot:run
 
-# 3) Levantar cada BFF, cada uno en su propia terminal
+# 4) Levantar cada BFF, cada uno en su propia terminal
 mvn -pl bff-web    spring-boot:run
 mvn -pl bff-mobile spring-boot:run
 mvn -pl bff-atm    spring-boot:run
@@ -92,8 +92,7 @@ Cada microservicio imprime en su log cuántos registros cargó y cuántos
 rechazó por datos inválidos (por ejemplo:
 `ms-cuentas: 17 cuentas cargadas, 983 filas rechazadas por datos invalidos`),
 ya que el dataset oficial incluye intencionalmente filas con datos
-inconsistentes (edades fuera de rango, montos inválidos, tipos de cuenta
-inexistentes, duplicados).
+inconsistentes.
 
 Cuentas de ejemplo ya cargadas y listas para probar: `101, 105, 106, 108,
 109, 117, 118, 122, 124, 127, 128, 130, 132, 133, 143, 144, 147`.
@@ -103,12 +102,14 @@ de H2 de cada microservicio, por ejemplo:
 `http://localhost:8090/h2-console` (JDBC URL: `jdbc:h2:mem:mscuentas`,
 usuario `sa`, sin contraseña).
 
+Puedes verificar el panel de Eureka en `http://localhost:8761`, y la
+configuración servida por el Config Server en
+`http://localhost:8888/ms-cuentas/default`.
+
 ### Modo productivo (PostgreSQL vía Docker)
 
 Para un despliegue más cercano a producción, cada microservicio también
-puede apuntar a PostgreSQL en vez de H2 (basta con cambiar la
-dependencia `h2` por `postgresql` en su `pom.xml` y ajustar su
-`application.yml` con las credenciales de abajo):
+puede apuntar a PostgreSQL en vez de H2:
 
 ```bash
 docker compose up -d
@@ -116,8 +117,8 @@ docker compose up -d
 
 Esto levanta un Postgres en `localhost:5432`, base `bank_batch`,
 usuario/clave `bank_batch`/`bank_batch`. En este modo, los datos deben
-poblarse mediante el proyecto de migración batch de la Semana 3 (Spring
-Batch), no con los cargadores CSV descritos arriba.
+poblarse mediante el proyecto de migración batch de la Semana 3, no con
+los cargadores CSV.
 
 ## 5. Autenticación y autorización por canal
 
@@ -176,3 +177,48 @@ internos, solo alcanzables por los BFF dentro de la misma red.
 
 Todas las respuestas de error siguen el mismo formato
 `{ "timestamp", "status", "error" }`.
+
+## 7. Spring Cloud (Semana 6): configuración centralizada, service discovery y tolerancia a fallos
+
+### Config Server (`config-server`, puerto 8888)
+
+Externaliza la configuración de `ms-cuentas`, que dejó de tener su propio
+`application.yml` completo y en su lugar le pregunta a este servidor al
+arrancar (`spring.config.import: optional:configserver:http://localhost:8888`).
+Modo `native`: la configuración vive en
+`config-server/src/main/resources/config-repo/`, como archivos locales
+(sin depender de un repositorio Git externo).
+
+Verificación: `GET http://localhost:8888/ms-cuentas/default` devuelve el
+`ms-cuentas.yml` servido; el log de arranque de `ms-cuentas` confirma
+`Fetching config from server at : http://localhost:8888`.
+
+### Service Discovery (`eureka-server`, puerto 8761)
+
+`ms-movimientos` se registra automáticamente en Eureka al arrancar
+(`eureka.client.service-url.defaultZone: http://localhost:8761/eureka/`),
+de forma que puede ser localizado por nombre en vez de por URL fija.
+
+Verificación: el panel `http://localhost:8761` muestra
+`MS-MOVIMIENTOS` con estado `UP` en la tabla de instancias registradas;
+el log de arranque confirma `Registering application MS-MOVIMIENTOS with
+eureka with status UP`.
+
+### Tolerancia a fallos (`bff-atm`, con Resilience4j)
+
+`bff-atm` protege sus llamadas salientes a `ms-cuentas` (consulta de
+saldo y retiro) con un circuit breaker (`@CircuitBreaker`) y reintentos
+(`@Retry`), configurados en `bff-atm/src/main/resources/application.yml`:
+
+- Ventana de 5 llamadas, mínimo 3 para evaluar; si el 50% o más falla,
+  el circuito se abre por 10 segundos.
+- Hasta 3 reintentos con 500ms de espera entre cada uno.
+- Si el circuito está abierto o los reintentos se agotan, se activa un
+  método de fallback que devuelve un error explícito ("servicio no
+  disponible") en vez de datos inventados o dejar la petición esperando
+  indefinidamente.
+
+Verificación: con `ms-cuentas` detenido, las peticiones a
+`GET /api/atm/cuentas/{id}/saldo` fallan de forma controlada (en vez de
+quedarse esperando), y `GET http://localhost:8083/actuator/health`
+muestra el estado del circuito (`circuitBreakers.msCuentas.state`).

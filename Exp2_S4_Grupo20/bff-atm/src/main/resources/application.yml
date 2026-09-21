@@ -19,7 +19,7 @@ security:
   jwt:
     secret: ${ATM_JWT_SECRET:atm-bff-secreto-distinto-y-mas-critico-0003}
     issuer: bff-atm
-    expiration-minutes: ${ATM_JWT_EXP_MIN:3}
+    expiration-minutes: ${ATM_JWT_EXP_MIN:15}
   atm:
     api-key: ${ATM_DEVICE_API_KEY:atm-device-key-demo-cambiar}
 
